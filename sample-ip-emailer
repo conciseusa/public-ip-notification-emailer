@@ -1,0 +1,31 @@
+    if(isset($_GET['loc']) && (preg_match('/^[a-zA-Z0-9]+$/', $_GET['loc']) > 0)) $loc = $_GET['loc'];
+		else $loc = FALSE;
+		
+		if(isset($_GET['cc']) && (preg_match('/^[a-zA-Z0-9]+$/', $_GET['cc']) > 0)) $cc = $_GET['cc'];
+		else $cc = FALSE;
+		
+		if(!isset($_SERVER['REMOTE_ADDR'])) {
+			echo 'Missing REMOTE Data.';
+			break;
+		}
+
+		if(!$loc || !$cc) {
+			echo 'Missing Data.'.$loc.$cc;
+			break;
+		}
+		
+		if($cc !== sha1($loc.'salty_salt')) {
+			echo 'BCC.';
+			break;
+		}
+
+		echo 'SIP';
+
+		$to      = 'email@yahoo-gmail-etc.com';
+		$subject = $loc.' = '.$_SERVER['REMOTE_ADDR'];
+		$message = $loc.' = '.$_SERVER['REMOTE_ADDR']."\r\n".date(DATE_RFC2822);
+		$headers = 'From: '.MAIN_EMAIL."\r\n".
+		    'Reply-To: '.MAIN_EMAIL."\r\n".
+		    'X-Mailer: PHP/'.phpversion();
+
+		mail($to, $subject, $message, $headers);
